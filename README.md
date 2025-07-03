@@ -28,17 +28,19 @@ This is a simple real-time **chat application** that allows **two users to commu
 
 ### For frontend:
 
-
+```bash 
 cd frontend
 npm install
 npm run dev
-
+```
 
 ### For backend:
 
+```bash
 cd backend
 npm install
 npm run dev
+```
 
 ## 👤 Author
 
