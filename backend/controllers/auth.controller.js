@@ -2,11 +2,28 @@ import { generateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 
-export const login = (req, res) => {
+export const login = async(req, res) => {
   try {
-    
+    const { email, password } = req.body;
+    const user=await User.findOne({ email });
+    if(!user){
+      return res.status(400).json({message:"User not found with this email"});
+    }
+    const isPasswordValid = await bcrypt.compare(password,user.password);
+    if(!isPasswordValid){
+      return res.status(400).json({message:"Invalid password"});
+    }
+    //generating token and setting the cookie
+    generateToken(user._id,res);
+    res.status(200).json({
+      _id: user._id,
+      email: user.email,
+      fullname: user.fullname,
+      profilePicture: user.profilePicture,
+    });
   } catch (error) {
-    
+    console.error("Error in login:", error);
+    return res.status(500).json({message:"Internal server error"});
   }
 };
 
@@ -47,8 +64,10 @@ export const register = async(req, res) => {
 };
 export const logout = (req, res) => {
   try {
-    
+    res.clearCookie('jwt', { httpOnly: true });
+    res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    
+    console.error("Error in logout:", error);
+    return res.status(500).json({message:"Internal server error"});
   }
 };
