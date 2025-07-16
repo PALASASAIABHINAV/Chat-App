@@ -83,9 +83,46 @@ export const logout = (req, res) => {
 
 export const updateProfile = async (req, res) => {
     try {
-        
+        const {profilePicture} = req.body;
+        if (!profilePicture) {
+            return res.status(400).send("Profile picture is required");
+        }
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+        await cloudinary.uploader.upload(profilePicture);
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user._id,
+            { profilePicture: uploadResponse.secure_url },
+            { new: true }
+        );
+        res.status(200).send({
+            _id: updatedUser._id,
+            username: updatedUser.username,
+            email: updatedUser.email,
+            profilePicture: updatedUser.profilePicture,
+        });
     } catch (error) {
         console.error("Error updating profile:", error);
+        res.status(500).send("Internal Server Error");
+    }
+}
+
+export const checkAuth = (req, res) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            return res.status(401).send("Unauthorized");
+        }
+        res.status(200).send({
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            profilePicture: user.profilePicture,
+        });
+    } catch (error) {
+        console.error("Error checking authentication:", error);
         res.status(500).send("Internal Server Error");
     }
 }
