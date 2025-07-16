@@ -44,6 +44,6 @@ npm run dev
 
 ## 👤 Author
 
-- **Your Name**
+- **SAI ABHINAV**
 - [GitHub](https://github.com/PALASASAIABHINAV)
 - [LinkedIn](https://www.linkedin.com/in/palasa-sai-abhinav-178167292/)

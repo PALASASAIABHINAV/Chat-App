@@ -1,34 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect } from 'react'
+import Navbar from './components/Navbar'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import SignUp from './pages/SignUp'
+import Login from './pages/Login'
+import Settings from './pages/Settings'
+import Profile from './pages/Profile'
+import HomePage from './pages/HomePage'
+import { useAuthStore } from './store/useAuthStore'
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const {authUser,checkAuth,isCheckingAuth}=useAuthStore();
+  const location = useLocation();
+  useEffect(()=>{
+     checkAuth();
+  },[checkAuth])
+
+  if(isCheckingAuth&&!authUser){
+    return (
+      <div className="flex items-center justify-center h-screen w-screen">
+        <span className="text-2xl font-semibold animate-pulse">...
+        </span>
+      </div>
+    );
+  }
+
+  // Hide Navbar on login and signup routes
+  const hideNavbar = location.pathname === '/login' || location.pathname === '/signup';
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div>
+      {!hideNavbar && <Navbar/>}
+      <Routes>
+        <Route path='/' element={authUser?<HomePage/>:<Navigate to='/login' />}/> 
+        <Route path='/signup' element={!authUser?<SignUp/>:<Navigate to='/'/>}/>
+        <Route path='/login' element={!authUser?<Login/>:<Navigate to='/'/>} />
+        <Route path='/setting' element={<Settings/>} />
+        <Route path='/profile' element={authUser?<Profile/>:<Navigate to='/login'/>} />
+      </Routes>
+    </div>
   )
 }
 
