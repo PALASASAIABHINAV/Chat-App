@@ -60,4 +60,27 @@ export const useAuthStore = create((set) => ({
       set({ isLoading: false, isSigningUp: false });
     }
   },
+
+  updateprofile:async({profilePicture})=>{
+    try {
+        set({isLoading:true,isUpdatingProfile:true});
+        const response=await axios.put(
+            "http://localhost:4002/api/auth/update-profile",{
+                profilePicture
+            },{
+                withCredentials:true
+            }
+        );
+        set({authUser:response.data,isUpdatingProfile:false});
+        return {success:true};
+    } catch (error) {
+        set({ authUser: null });
+      console.log("Error while Updating Profile:", error);
+      return { success: false, error: error?.response?.data || "Update profile failed" };
+    }finally{
+      set({isUpdatingProfile:false})
+    }
+
+  }
+
 }));

@@ -1,6 +1,7 @@
 import { generateToken } from "../lib/utils/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from 'bcrypt';
+import cloudinary from "cloudinary";
 
 export const register = async (req, res) => {
      try {
@@ -63,6 +64,7 @@ export const login = async(req, res) => {
         username: user.username,
         email: user.email,
         profilePicture: user.profilePicture,
+        createdAt: user.createdAt,
     });
 
   } catch (error) {
@@ -97,12 +99,7 @@ export const updateProfile = async (req, res) => {
             { profilePicture: uploadResponse.secure_url },
             { new: true }
         );
-        res.status(200).send({
-            _id: updatedUser._id,
-            username: updatedUser.username,
-            email: updatedUser.email,
-            profilePicture: updatedUser.profilePicture,
-        });
+        res.status(200).send(updatedUser);
     } catch (error) {
         console.error("Error updating profile:", error);
         res.status(500).send("Internal Server Error");
@@ -115,12 +112,7 @@ export const checkAuth = (req, res) => {
         if (!user) {
             return res.status(401).send("Unauthorized");
         }
-        res.status(200).send({
-            _id: user._id,
-            username: user.username,
-            email: user.email,
-            profilePicture: user.profilePicture,
-        });
+        res.status(200).send(user);
     } catch (error) {
         console.error("Error checking authentication:", error);
         res.status(500).send("Internal Server Error");
